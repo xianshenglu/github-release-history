@@ -31,7 +31,8 @@ jobs:
           git config --local user.name "GitHub Action"        
           git checkout $BRANCH_NAME
           git remote set-url origin https://$PAT_BOT_RELEASE@github.com/xianshenglu/github-release-history/
-          git diff --quiet && git diff --staged --quiet || (git fetch && git merge && git add . && git commit -m "ci: add release data" && git push)
+          git fetch && git merge && git add .
+          git diff --quiet && git diff --staged --quiet || (git commit -m "ci: add release data" && git push)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PAT_BOT_RELEASE: ${{ secrets.PAT_BOT_RELEASE }}
