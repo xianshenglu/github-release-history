@@ -5,7 +5,20 @@ type RepoConfig = {
   user: string;
   repo: string;
 };
-
+type ReleaseFile = {
+  releases: Partial<ReleaseStatistics>;
+};
+type ReleaseAsset = {
+  name: string;
+  created_at: string;
+  downloads: Record<string, number>;
+};
+type ReleaseInfo = {
+  assets: Record<string, ReleaseAsset>;
+  created_at: string;
+  name: string;
+};
+type ReleaseStatistics = Record<string, ReleaseInfo>;
 function getReposConfig() {
   return repos.filter((repo) => repo.user === "xianshenglu");
 }
@@ -31,28 +44,99 @@ async function fetchReposData(repos: RepoConfig[]) {
 function getRepoFolderPath(repo: RepoConfig) {
   return `./data/${repo.user}/${repo.repo}`;
 }
+function getRepoDataPath(repo: RepoConfig) {
+  return `${getRepoFolderPath(repo)}/data.json`;
+}
+function getRepoRawDataPath(repo: RepoConfig) {
+  return `${getRepoFolderPath(repo)}/raw`;
+}
 function createFolderIfNeeded(repos: RepoConfig[]) {
   repos.forEach((repo) => {
-    var dir = getRepoFolderPath(repo);
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+    var filepath = getRepoDataPath(repo);
+    if (!fs.existsSync(filepath)) {
+      fs.mkdirSync(getRepoFolderPath(repo), { recursive: true });
+      fs.writeFileSync(filepath, `{"releases":{}}`);
+    }
+    const rawDataFolder = getRepoRawDataPath(repo);
+    if (!fs.existsSync(rawDataFolder)) {
+      fs.mkdirSync(rawDataFolder, { recursive: true });
     }
   });
 }
-
-function writeToFile(responseList: any[], repos: RepoConfig[]) {
+function getCurDate() {
+  return new Date().toISOString().split("T")[0];
+}
+function formatResponse(responseList: any[]): ReleaseStatistics[] {
+  const resultList: ReleaseStatistics[] = [];
+  responseList.forEach((response) => {
+    response.forEach((release: any) => {
+      const { id, assets, created_at, name } = release;
+      const result: ReleaseStatistics = {};
+      result[id] = {
+        created_at,
+        name,
+        assets: {},
+      };
+      assets.forEach((asset: any) => {
+        const yyyyMMdd = getCurDate();
+        result[id].assets[asset.id] = {
+          name: asset.name,
+          created_at: asset.created_at,
+          downloads: {} as any,
+        };
+        result[id].assets[asset.id].downloads = {
+          [yyyyMMdd]: asset.download_count,
+        };
+      });
+      resultList.push(result);
+    });
+  });
+  return resultList;
+}
+function insertNewData(dataList: ReleaseStatistics[], repos: RepoConfig[]) {
+  const resultList = repos.map((repo, index) => {
+    const historyData: ReleaseFile = require(getRepoDataPath(repo));
+    const newData = dataList[index];
+    Object.entries(newData).forEach(([releaseId, releaseData]) => {
+      const historyRelease = historyData.releases;
+      if (!historyRelease[releaseId]) {
+        historyRelease[releaseId] = releaseData;
+        return;
+      }
+      Object.entries(releaseData.assets).forEach(([assetId, assetData]) => {
+        const downloads = historyRelease[releaseId]!.assets[assetId].downloads;
+        Object.entries(assetData.downloads).forEach(([curDate, count]) => {
+          downloads[curDate] = count;
+        });
+      });
+    });
+    return historyData;
+  });
+  return resultList;
+}
+function writeToFile(
+  dataList: any[],
+  repos: RepoConfig[],
+  getPath: (repo: RepoConfig) => string
+) {
   repos.forEach((repo, index) => {
-    const path = getRepoFolderPath(repo) + "/" + Date.now() + ".json";
-    const data = responseList[index];
+    const path = getPath(repo);
+    const data = dataList[index];
     fs.writeFileSync(path, JSON.stringify(data));
   });
 }
-
 async function main() {
   const repos = getReposConfig();
   createFolderIfNeeded(repos);
   const responseList = await fetchReposData(repos);
-  writeToFile(responseList, repos);
+  writeToFile(
+    responseList,
+    repos,
+    (repo) => getRepoRawDataPath(repo) + "/" + getCurDate() + ".json"
+  );
+  const formattedData = formatResponse(responseList);
+  const integratedData = insertNewData(formattedData, repos);
+  writeToFile(integratedData, repos, (repo) => getRepoDataPath(repo));
   process.exit(0);
 }
 main();
