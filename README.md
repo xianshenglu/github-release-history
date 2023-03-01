@@ -1,7 +1,10 @@
 # Github Release History
 Track daily download history for your Github project releases. See an [example](https://xianshenglu.github.io/github-release-history/?username=xianshenglu&repository=cloudflare-ip-tester-app).
 
-To start tracking a repository, simply open an issue or pull request to add it to the `repos.json` file and then check back in a few days.
+To start tracking a repository, 
+
+- simply fork, and add it to the `repos.json` file.
+- enable the github action
 
 This project is not affiliated with or endorsed by GitHub, Inc.
 
