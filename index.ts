@@ -69,25 +69,35 @@ function getCurDate() {
 function formatResponse(responseList: any[]): ReleaseStatistics[] {
   const resultList: ReleaseStatistics[] = [];
   responseList.forEach((response) => {
+    const result: ReleaseStatistics = {};
     response.forEach((release: any) => {
       const { id, assets, created_at, name } = release;
-      const result: ReleaseStatistics = {};
       result[id] = {
         created_at,
         name,
         assets: {},
       };
+      let total = 0;
+      const curDate = getCurDate();
       assets.forEach((asset: any) => {
-        const yyyyMMdd = getCurDate();
         result[id].assets[asset.id] = {
           name: asset.name,
           created_at: asset.created_at,
           downloads: {} as any,
         };
         result[id].assets[asset.id].downloads = {
-          [yyyyMMdd]: asset.download_count,
+          [curDate]: asset.download_count,
         };
+        total += asset.download_count;
       });
+      const totalName = "total";
+      result[id].assets[totalName] = {
+        name: totalName,
+        created_at: "",
+        downloads: {
+          [curDate]: total,
+        },
+      };
       resultList.push(result);
     });
   });
