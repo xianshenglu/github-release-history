@@ -1,7 +1,7 @@
 {
   "name": "github-release-history",
   "version": "1.0.0",
-  "description": "Track daily download history for your Github project releases. See an [example](https://dail8859.github.io/github-release-history/?username=dail8859&repository=DoxyIt).",
+  "description": "Track daily download history for your Github project releases. See an [example](https://xianshenglu.github.io/github-release-history/?username=xianshenglu&repository=cloudflare-ip-tester-app).",
   "main": "index.js",
   "directories": {
     "doc": "docs"

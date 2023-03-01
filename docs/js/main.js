@@ -150,7 +150,7 @@ function getGraphData() {
 	var user = $("#username").val();
 	var repository = $("#repository").val();
 
-	var url = apiRoot + "repos/dail8859/github-release-history/contents/data/" + user + "/" + repository + ".json";
+	var url = apiRoot + "repos/xianshenglu/github-release-history/contents/data/" + user + "/" + repository + "/data.json";
 	//var url = "data/" + user + "/" + repository + ".json";
 	//console.log(url)
 	$.getJSON(url, function(blob) {
@@ -190,7 +190,7 @@ function getGraphData() {
 			// It is a valid repo but hasn't been set up to be tracked yet
 			var html = "<div class='col-md-6 col-md-offset-3 release'><h4><span class='glyphicon glyphicon-info-sign'></span>&nbsp&nbspThat repository hasn't been set up to have the download count tracked yet.</h4>";
 			html += "<p>&nbsp</p><p>It's simple to start tracking it. Check the documentation to open an issue or pull request.</p>";
-			html += "<p>&nbsp</p><p><i>Just show me an <a href='index.html?username=dail8859&repository=DoxyIt'>example</a>!</i></p></div>";
+			html += "<p>&nbsp</p><p><i>Just show me an <a href='index.html?username=xianshenglu&repository=cloudflare-ip-tester-app'>example</a>!</i></p></div>";
 			var resultDiv = $("#stats-result");
 			resultDiv.hide();
 			resultDiv.html(html);
@@ -200,7 +200,7 @@ function getGraphData() {
 			if (jqXHR.status == 404) {
 				// Can't find the project on Github at all
 				html = "<div class='col-md-6 col-md-offset-3 error output'><h4><span class='glyphicon glyphicon-exclamation-sign'></span>&nbsp&nbspThat project does not exist!</h4>";
-				html += "<p><i>Just show me an <a href='index.html?username=dail8859&repository=DoxyIt'>example</a>!</i></p></div>";
+				html += "<p><i>Just show me an <a href='index.html?username=xianshenglu&repository=cloudflare-ip-tester-app'>example</a>!</i></p></div>";
 			}
 			else if (jqXHR.status == 403) {
 				// Something bad happened. Probably a rate limit
