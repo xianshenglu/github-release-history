@@ -93,7 +93,7 @@ function formatResponse(responseList: any[]): ReleaseStatistics[] {
       const totalName = "total";
       result[id].assets[totalName] = {
         name: totalName,
-        created_at: "",
+        created_at: new Date().toUTCString(),
         downloads: {
           [curDate]: total,
         },

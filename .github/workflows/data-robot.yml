@@ -3,9 +3,8 @@ name: data-robot
 on:
   workflow_dispatch:
   schedule:
-    # Beijing Time 07:45, daily, reference https://crontab.guru/ and https://datetime360.com/cn/utc-beijing-time/
-    # morning time before Beijing Time 11:00 seems not work , for example 45 0 */2 * *, don't know why
-    - cron: "45 23 * * *"
+    # Beijing Time 20:00, daily, reference https://crontab.guru/ and https://datetime360.com/cn/utc-beijing-time/
+    - cron: "0 12 * * *"
 
 jobs:
   data-robot:
